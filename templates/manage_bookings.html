@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPU Booking Status</title>
+    <title>Manage GPU Bookings</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,11 +42,11 @@
     </style>
 </head>
 <body>
-    <h1>GPU Booking Status</h1>
+    <h1>Manage GPU Bookings</h1>
     <div class="navigation">
-        <a href="{{ url_for('status', month_offset=month_offset-1) }}">&lt;&lt;&lt; Previous Month</a>
+        <a href="{{ url_for('manage_bookings', month_offset=month_offset-1) }}">Previous Month</a>
         <span>{{ start_date.strftime('%B %Y') }}</span>
-        <a href="{{ url_for('status', month_offset=month_offset+1) }}">Next Month &gt;&gt;&gt;</a>
+        <a href="{{ url_for('manage_bookings', month_offset=month_offset+1) }}">Next Month</a>
     </div>
     <table>
         <thead>
@@ -68,6 +68,12 @@
                             <td class="booked">
                                 <div>Booked by: {{ bookings[current_date][gpu.id].booker_name }}</div>
                                 <div>Purpose: {{ bookings[current_date][gpu.id].purpose }}</div>
+                                <!-- Form to free the booking -->
+                                <form action="{{ url_for('free_booking') }}" method="post">
+                                    <input type="hidden" name="booking_id" value="{{ bookings[current_date][gpu.id].id }}">
+                                    <input type="hidden" name="month_offset" value="{{ month_offset }}">
+                                    <button type="submit">Remove</button>
+                                </form>
                             </td>
                         {% else %}
                             <td class="available">Available</td>
@@ -78,9 +84,7 @@
         </tbody>
     </table>
     <div class="footer">
-        *To delete current booking go to manage booking<br>
-        <a href="{{ url_for('index') }}">Back to Booking Menu</a><br>
-        <a href="{{ url_for('manage_bookings') }}">Manage Bookings</a>
+        <a href="{{ url_for('index') }}">Back to Booking</a>
     </div>
 </body>
 </html>
