@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPU Booking</title>
+</head>
+<body>
+    <h1>GPU Booking</h1>
+    <form action="{{ url_for('book') }}" method="post">
+        <label for="booker_name">Name:</label>
+        <input type="text" name="booker_name" required>
+        <label for="from_date">From:</label>
+        <input type="date" name="from_date" required>
+        <label for="to_date">To:</label>
+        <input type="date" name="to_date" required>
+        <label for="purpose">Purpose:</label>
+        <input type="text" name="purpose" required>
+        <ul>
+            {% for gpu in gpus %}
+                <li>
+                    <input type="checkbox" name="gpu_ids" value="{{ gpu.id }}"> GPU {{ gpu.id }}
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Book</button>
+    </form>
+    <a href="{{ url_for('status') }}">View Booking Status</a>
+</body>
+</html>

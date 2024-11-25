@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPU Booking Status</title>
+</head>
+<body>
+    <h1>GPU Booking Status</h1>
+    <ul>
+        {% for gpu in gpus %}
+            <li>
+                <h2>GPU {{ gpu.id }}</h2>
+                <ul>
+                    {% for date, info in gpu.availability.items() %}
+                        <li>{{ date }} - {{ 'Available' if info['available'] else 'Booked by ' + info['booker'] + ' for ' + info['purpose'] }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('index') }}">Back to Booking</a>
+</body>
+</html>
