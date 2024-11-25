@@ -4,21 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPU Booking Status</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .available {
+            background-color: #d4edda;
+        }
+        .booked {
+            background-color: #f8d7da;
+        }
+    </style>
 </head>
 <body>
     <h1>GPU Booking Status</h1>
-    <ul>
-        {% for gpu in gpus %}
-            <li>
-                <h2>GPU {{ gpu.id }}</h2>
-                <ul>
-                    {% for date, info in gpu.availability.items() %}
-                        <li>{{ date }} - {{ 'Available' if info['available'] else 'Booked by ' + info['booker'] + ' for ' + info['purpose'] }}</li>
+    <div>
+        <a href="{{ url_for('status', month_offset=month_offset-1) }}">Previous Month</a>
+        <span>{{ start_date.strftime('%B %Y') }}</span>
+        <a href="{{ url_for('status', month_offset=month_offset+1) }}">Next Month</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>GPU ID</th>
+                {% for i in range(days_in_month) %}
+                    <th>{{ (start_date + timedelta(days=i)).strftime('%Y-%m-%d') }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for gpu in gpus %}
+                <tr>
+                    <td>GPU {{ gpu.id }}</td>
+                    {% for i in range(days_in_month) %}
+                        {% set date_str = (start_date + timedelta(days=i)).strftime('%Y-%m-%d') %}
+                        <td class="{% if date_str in gpu.availability and not gpu.availability[date_str]['available'] %}booked{% else %}available{% endif %}">
+                            {% if date_str in gpu.availability %}
+                                {% if gpu.availability[date_str]['available'] %}
+                                    Available
+                                {% else %}
+                                    Booked by {{ gpu.availability[date_str]['booker'] }} for {{ gpu.availability[date_str]['purpose'] }}
+                                {% endif %}
+                            {% else %}
+                                Available
+                            {% endif %}
+                        </td>
                     {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     <a href="{{ url_for('index') }}">Back to Booking</a>
 </body>
 </html>

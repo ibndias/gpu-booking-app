@@ -37,7 +37,15 @@ def book():
 
 @app.route('/status')
 def status():
-    return render_template('status.html', gpus=gpus)
+    month_offset = int(request.args.get('month_offset', 0))
+    current_date = datetime.utcnow().replace(day=1)
+    target_month = current_date.month + month_offset
+    target_year = current_date.year + (target_month - 1) // 12
+    target_month = (target_month - 1) % 12 + 1
+    start_date = datetime(target_year, target_month, 1)
+    next_month = (start_date.replace(day=28) + timedelta(days=4)).replace(day=1)
+    days_in_month = (next_month - start_date).days
+    return render_template('status.html', gpus=gpus, datetime=datetime, timedelta=timedelta, start_date=start_date, days_in_month=days_in_month, month_offset=month_offset)
 
 if __name__ == '__main__':
     app.run(debug=True)
