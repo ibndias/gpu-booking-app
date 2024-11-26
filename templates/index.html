@@ -12,6 +12,21 @@
         h1 {
             text-align: center;
         }
+        .flash-message {
+            max-width: 600px;
+            margin: 0 auto 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .flash-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
         form {
             max-width: 600px;
             margin: 0 auto;
@@ -55,11 +70,42 @@
         .footer {
             text-align: center;
             margin-top: 20px;
+            max-width: 600px;
+            margin: 20px auto 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer button {
+            width: 48%;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .footer button:nth-child(1) {
+            background-color: #4CAF50;
+        }
+        .footer button:nth-child(1):hover {
+            background-color: #45a049;
+        }
+        .footer button:nth-child(2) {
+            background-color: #008CBA;
+        }
+        .footer button:nth-child(2):hover {
+            background-color: #007bb5;
         }
     </style>
 </head>
 <body>
     <h1>GPU Booking</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     <form action="{{ url_for('book') }}" method="post">
         <label for="booker_name">Name:</label>
         <input type="text" name="booker_name" required>
@@ -79,8 +125,8 @@
         <button type="submit">Book</button>
     </form>
     <div class="footer">
-        <a href="{{ url_for('status') }}">View Booking Status</a><br>
-        <a href="{{ url_for('manage_bookings') }}">Manage Bookings</a>
+        <button onclick="location.href='{{ url_for('status') }}'">View Booking Status</button>
+        <button onclick="location.href='{{ url_for('manage_bookings') }}'">Manage Bookings</button>
     </div>
 </body>
 </html>

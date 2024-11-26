@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///booking.db'
+# app.config['SECRET_KEY'] = 'your_secret_key'  # Add a secret key for flash messages
 db = SQLAlchemy(app)
 
 # Define database models
@@ -42,11 +43,24 @@ def book():
     from_date_obj = datetime.strptime(from_date, '%Y-%m-%d').date()
     to_date_obj = datetime.strptime(to_date, '%Y-%m-%d').date()
     
+    booking_conflict = False
     for gpu_id in selected_gpus:
         current_date = from_date_obj
         while current_date <= to_date_obj:
             existing_booking = Booking.query.filter_by(gpu_id=gpu_id, date=current_date).first()
-            if not existing_booking:
+            if existing_booking:
+                booking_conflict = True
+                break
+            current_date += timedelta(days=1)
+        if booking_conflict:
+            break
+    
+    if booking_conflict:
+        flash('Error: One or more selected dates are already booked.', 'error')
+    else:
+        for gpu_id in selected_gpus:
+            current_date = from_date_obj
+            while current_date <= to_date_obj:
                 booking = Booking(
                     gpu_id=gpu_id,
                     date=current_date,
@@ -54,8 +68,10 @@ def book():
                     purpose=purpose
                 )
                 db.session.add(booking)
-            current_date += timedelta(days=1)
-    db.session.commit()
+                current_date += timedelta(days=1)
+        db.session.commit()
+        flash('Success: Booking completed successfully.', 'success')
+    
     return redirect(url_for('index'))
 
 @app.route('/status')
